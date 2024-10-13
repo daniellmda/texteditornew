@@ -14,6 +14,7 @@ class Toolbar {
         this.bgColorInput = document.getElementById('hiliteColor');
         this.buttons = document.querySelectorAll('.btn-toolbar button');
         this.showCodeBtn = document.getElementById('show-code');
+        this.fontPicker = document.getElementById('fontPicker');
     }
 
     attachEventListeners() {
@@ -22,7 +23,7 @@ class Toolbar {
         this.fontSizeSelect.addEventListener('change', (e) => this.formatDoc('fontSize', e.target.value));
         this.colorInput.addEventListener('input', (e) => this.formatDoc('foreColor', e.target.value));
         this.bgColorInput.addEventListener('input', (e) => this.formatDoc('hiliteColor', e.target.value));
-        
+        this.fontPicker.addEventListener('change', (e) => this.changeFont(e.target.value));
         this.buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const command = button.getAttribute('data-command');
@@ -37,6 +38,7 @@ class Toolbar {
         });
     }
 
+    
     formatDoc(command, value = null) {
         document.execCommand(command, false, value);
     }
@@ -55,6 +57,25 @@ class Toolbar {
                 break;
         }
         this.fileSelect.selectedIndex = 0;
+    }
+    changeFont(fontFamily) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const span = document.createElement('span');
+            span.style.fontFamily = fontFamily;
+            
+            if (range.toString().trim() === '') {
+                // If no text is selected, apply the font to the entire content
+                this.contentInstance.element.style.fontFamily = fontFamily;
+            } else {
+                // If text is selected, wrap it in a span with the new font
+                range.surroundContents(span);
+            }
+        } else {
+            // If no selection, apply the font to the entire content
+            this.contentInstance.element.style.fontFamily = fontFamily;
+        }
     }
 
     handleFileOperation(operation) {
