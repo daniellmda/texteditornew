@@ -115,3 +115,29 @@ a {
 #show-code[data-active="true"] {
 	background: #eee;
 }
+
+.search-replace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.search-replace input {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    outline: none;
+}
+.search-replace button {
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+}
+.search-replace button:hover {
+    background: #f3f3f3;
+}
+.highlight {
+    background-color: yellow; /* Change color as needed */
+}

@@ -1,3 +1,32 @@
+// Класс Content отвечает за основное содержимое редактора текста
+class Content {
+    constructor() {
+        this.element = document.getElementById('content'); // Элемент редактора
+        this.currentMatchIndex = 0; // Индекс текущего найденного элемента
+    }
+
+    // Установка содержимого редактора
+    setContent(content) {
+        this.element.innerHTML = content; // Устанавливаем новое содержимое
+    }
+
+    // Получение содержимого редактора
+    getContent() {
+        return this.element.innerHTML; // Возвращаем текущее содержимое
+    }
+
+    // Переключение режима просмотра кода
+    toggleCodeView() {
+        if (this.element.isContentEditable) {
+            this.element.contentEditable = false; // Отключаем редактирование
+            this.element.style.border = 'none'; // Убираем границу
+        } else {
+            this.element.contentEditable = true; // Включаем редактирование
+            this.element.style.border = '1px solid #ccc'; // Включаем границу
+        }
+    }
+}
+
 // Класс Toolbar отвечает за панель инструментов редактора текста
 class Toolbar {
     constructor(contentInstance) {
@@ -17,6 +46,12 @@ class Toolbar {
         this.buttons = document.querySelectorAll('.btn-toolbar button'); // Кнопки панели инструментов
         this.showCodeBtn = document.getElementById('show-code'); // Кнопка для переключения режима кода
         this.fontPicker = document.getElementById('fontPicker'); // Выпадающий список для выбора шрифта
+        this.searchInput = document.getElementById('searchInput'); // Поле для поиска
+        this.replaceInput = document.getElementById('replaceInput'); // Поле для замены
+        this.prevButton = document.getElementById('prevButton'); // Кнопка "предыдущий"
+        this.nextButton = document.getElementById('nextButton'); // Кнопка "следующий"
+        this.replaceButton = document.getElementById('replaceButton'); // Кнопка замены
+        this.replaceAllButton = document.getElementById('replaceAllButton'); // Кнопка замены всех
     }
 
     // Метод для добавления событий на элементы
@@ -27,6 +62,10 @@ class Toolbar {
         this.colorInput.addEventListener('input', (e) => this.formatDoc('foreColor', e.target.value)); // Изменение цвета текста
         this.bgColorInput.addEventListener('input', (e) => this.formatDoc('hiliteColor', e.target.value)); // Изменение цвета фона
         this.fontPicker.addEventListener('change', (e) => this.changeFont(e.target.value)); // Изменение шрифта
+        this.prevButton.addEventListener('click', () => this.findText('prev')); // Обработка нажатия на "предыдущий"
+        this.nextButton.addEventListener('click', () => this.findText('next')); // Обработка нажатия на "следующий"
+        this.replaceButton.addEventListener('click', () => this.replaceText(false)); // Обработка нажатия на замену
+        this.replaceAllButton.addEventListener('click', () => this.replaceText(true)); // Обработка нажатия на замену всех
         this.buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const command = button.getAttribute('data-command'); // Получаем команду из атрибута кнопки
@@ -144,63 +183,56 @@ class Toolbar {
         const url = prompt('Insert url'); // Запрашиваем URL у пользователя
         this.formatDoc('createLink', url); // Применяем команду создания ссылки
     }
-}
 
-// Класс Content управляет содержимым редактора
-class Content {
-    constructor() {
-        this.element = document.getElementById('content'); // Получаем элемент редактора
-        this.attachEventListeners(); // Присоединяем события
-    }
+    // Метод поиска текста
+    findText(direction) {
+        const searchTerm = this.searchInput.value;
+        const content = this.contentInstance.element.innerHTML;
 
-    // Присоединение событий для обработки ссылок
-    attachEventListeners() {
-        this.element.addEventListener('mouseenter', () => this.handleLinks()); // Наведение мыши на контент
-    }
+        // Сброс выделения
+        this.contentInstance.element.innerHTML = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
 
-    // Обработка ссылок внутри редактора
-    handleLinks() {
-        const links = this.element.querySelectorAll('a'); // Находим все ссылки в редакторе
-        links.forEach(link => {
-            link.addEventListener('mouseenter', () => {
-                this.element.setAttribute('contenteditable', 'false'); // Отключаем редактирование при наведении на ссылку
-                link.target = '_blank'; // Открываем ссылку в новой вкладке
-            });
-            link.addEventListener('mouseleave', () => {
-                this.element.setAttribute('contenteditable', 'true'); // Включаем редактирование при уходе мыши
-            });
-        });
-    }
+        if (searchTerm) {
+            const regex = new RegExp(searchTerm, 'gi');
+            const matches = [...content.matchAll(regex)];
 
-    // Переключение между режимом кода и текстом
-    toggleCodeView() {
-        if (this.element.getAttribute('contenteditable') === 'true') {
-            this.element.textContent = this.element.innerHTML; // Показ HTML
-            this.element.setAttribute('contenteditable', 'false');
-        } else {
-            this.element.innerHTML = this.element.textContent; // Показ форматированного текста
-            this.element.setAttribute('contenteditable', 'true');
+            if (matches.length) {
+                const currentIndex = this.contentInstance.currentMatchIndex || 0;
+                const nextIndex = direction === 'next' ? (currentIndex + 1) % matches.length : (currentIndex - 1 + matches.length) % matches.length;
+
+                this.contentInstance.currentMatchIndex = nextIndex;
+
+                // Подсветка найденного текста
+                const start = matches[nextIndex].index;
+                const end = start + searchTerm.length;
+                const highlightedContent = content.substring(0, start) +
+                    `<span class="highlight">${content.substring(start, end)}</span>` +
+                    content.substring(end);
+
+                this.contentInstance.element.innerHTML = highlightedContent;
+            }
         }
     }
 
-    // Установка содержимого редактора
-    setContent(content) {
-        this.element.innerHTML = content;
-    }
+    // Метод замены текста
+    replaceText(replaceAll) {
+        const searchTerm = this.searchInput.value;
+        const replaceTerm = this.replaceInput.value;
+        const content = this.contentInstance.element.innerHTML;
 
-    // Получение текста из редактора
-    getContent() {
-        return this.element.innerText;
+        // Сброс выделения
+        this.contentInstance.element.innerHTML = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+
+        if (replaceAll) {
+            const newContent = content.replace(new RegExp(searchTerm, 'gi'), replaceTerm);
+            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+        } else {
+            const newContent = content.replace(new RegExp(searchTerm), replaceTerm);
+            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+        }
     }
 }
 
-// Класс TextEditor объединяет панель инструментов и контент
-class TextEditor {
-    constructor() {
-        this.content = new Content(); // Создаем экземпляр класса Content
-        this.toolbar = new Toolbar(this.content); // Создаем экземпляр Toolbar и связываем с Content
-    }
-}
-
-// Инициализация текстового редактора
-const textEditor = new TextEditor();
+// Инициализация редактора
+const contentInstance = new Content(); // Создаем экземпляр класса Content
+const toolbar = new Toolbar(contentInstance); // Создаем экземпляр класса Toolbar
