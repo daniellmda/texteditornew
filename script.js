@@ -215,22 +215,25 @@ class Toolbar {
     }
 
     // Метод замены текста
-    replaceText(replaceAll) {
-        const searchTerm = this.searchInput.value;
-        const replaceTerm = this.replaceInput.value;
-        const content = this.contentInstance.element.innerHTML;
+// Метод замены текста
+replaceText(replaceAll) {
+    const searchTerm = this.searchInput.value;
+    const replaceTerm = this.replaceInput.value;
+    const content = this.contentInstance.getContent(); // Получаем текущее содержимое
 
-        // Сброс выделения
-        this.contentInstance.element.innerHTML = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+    // Сброс выделения
+    this.contentInstance.setContent(content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1'));
 
-        if (replaceAll) {
-            const newContent = content.replace(new RegExp(searchTerm, 'gi'), replaceTerm);
-            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
-        } else {
-            const newContent = content.replace(new RegExp(searchTerm), replaceTerm);
-            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
-        }
+    if (replaceAll) {
+        // Замена всех вхождений, игнорируя регистр
+        const newContent = content.replace(new RegExp(searchTerm, 'gi'), replaceTerm);
+        this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+    } else {
+        // Замена только первого вхождения, игнорируя регистр
+        const newContent = content.replace(new RegExp(searchTerm, 'i'), replaceTerm);
+        this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
     }
+}
 }
 
 // Инициализация редактора
