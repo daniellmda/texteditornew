@@ -2,7 +2,7 @@
 class Content {
     constructor() {
         this.element = document.getElementById('content'); // Элемент редактора
-        this.currentMatchIndex = 0; // Индекс текущего найденного элемента
+        this.currentMatchIndex = -1; // Индекс текущего найденного элемента
     }
 
     // Установка содержимого редактора
@@ -229,7 +229,13 @@ class Toolbar {
             if (highlightedElement) {
                 highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+        } else {
+            // Оповещение, если совпадений не найдено
+            alert('Совпадений не найдено');
         }
+    } else {
+        // Оповещение, если поисковый запрос пуст
+        alert('Введите текст для поиска');
     }
 }
 
