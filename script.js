@@ -144,10 +144,14 @@ class Toolbar {
 
     // Сохранение файла как текстового
     saveAsText() {
-        const blob = new Blob([this.contentInstance.getContent()]); // Создаем Blob с содержимым редактора
+        let contentText = this.contentInstance.element.textContent; // Получаем текст без HTML
+        contentText = contentText.trim(); // Удаляем пробелы в начале и в конце текста
+        const blob = new Blob([contentText], { type: 'text/plain' }); // Создаем Blob с текстом
         const url = URL.createObjectURL(blob); // Создаем ссылку на этот Blob
         this.downloadFile(url, `${this.filename.value}.txt`); // Загружаем файл
     }
+    
+    
 
     // Сохранение файла как PDF
     saveAsPDF() {
@@ -185,34 +189,52 @@ class Toolbar {
     }
 
     // Метод поиска текста
-    findText(direction) {
-        const searchTerm = this.searchInput.value;
-        const content = this.contentInstance.element.innerHTML;
+   // Метод поиска текста
+   findText(direction) {
+    const searchTerm = this.searchInput.value;
+    let content = this.contentInstance.getContent();
 
-        // Сброс выделения
-        this.contentInstance.element.innerHTML = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+    // Сброс выделения
+    content = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+    this.contentInstance.setContent(content);
 
-        if (searchTerm) {
-            const regex = new RegExp(searchTerm, 'gi');
-            const matches = [...content.matchAll(regex)];
+    if (searchTerm) {
+        const regex = new RegExp(searchTerm, 'gi');
+        const matches = [...content.matchAll(regex)];
 
-            if (matches.length) {
-                const currentIndex = this.contentInstance.currentMatchIndex || 0;
-                const nextIndex = direction === 'next' ? (currentIndex + 1) % matches.length : (currentIndex - 1 + matches.length) % matches.length;
+        if (matches.length > 0) {
+            // Инициализация текущего индекса
+            if (this.contentInstance.currentMatchIndex === undefined) {
+                this.contentInstance.currentMatchIndex = direction === 'prev' ? matches.length - 1 : 0;
+            } else {
+                // Изменение индекса в зависимости от направления
+                if (direction === 'next') {
+                    this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex + 1) % matches.length;
+                } else if (direction === 'prev') {
+                    this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex - 1 + matches.length) % matches.length;
+                }
+            }
 
-                this.contentInstance.currentMatchIndex = nextIndex;
+            const currentIndex = this.contentInstance.currentMatchIndex;
+            const start = matches[currentIndex].index;
+            const end = start + searchTerm.length;
 
-                // Подсветка найденного текста
-                const start = matches[nextIndex].index;
-                const end = start + searchTerm.length;
-                const highlightedContent = content.substring(0, start) +
-                    `<span class="highlight">${content.substring(start, end)}</span>` +
-                    content.substring(end);
+            const highlightedContent = content.substring(0, start) +
+                `<span class="highlight">${content.substring(start, end)}</span>` +
+                content.substring(end);
 
-                this.contentInstance.element.innerHTML = highlightedContent;
+            this.contentInstance.setContent(highlightedContent);
+
+            const highlightedElement = this.contentInstance.element.querySelector('.highlight');
+            if (highlightedElement) {
+                highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
     }
+}
+
+
+
 
     // Метод замены текста
 // Метод замены текста
@@ -234,7 +256,7 @@ replaceText(replaceAll) {
         this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
     }
 }
-}
+}   
 
 // Инициализация редактора
 const contentInstance = new Content(); // Создаем экземпляр класса Content
