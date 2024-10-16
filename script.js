@@ -290,3 +290,87 @@ replaceText(replaceAll) {
 // Инициализация редактора
 const contentInstance = new Content(); // Создаем экземпляр класса Content
 const toolbar = new Toolbar(contentInstance); // Создаем экземпляр класса Toolbar
+
+class TabManager {
+    constructor() {
+        this.tabButtonsContainer = document.getElementById('tab-buttons');
+        this.contentElement = document.getElementById('content');
+        this.addTabButton = document.getElementById('add-tab-btn');
+        this.tabs = {};
+        this.currentTab = null;
+        this.tabCounter = 0;
+
+        this.addTabButton.addEventListener('click', () => this.addTab());
+        this.addTab(); // Создаем первую вкладку автоматически
+    }
+
+    addTab() {
+        this.tabCounter += 1;
+        const tabId = `tab-${this.tabCounter}`;
+        
+        // Создаем кнопку вкладки
+        const tabButton = document.createElement('button');
+        tabButton.textContent = `Tab ${this.tabCounter}`;
+        tabButton.dataset.tabId = tabId;
+        tabButton.addEventListener('click', () => this.switchTab(tabId));
+        tabButton.addEventListener('dblclick', (e) => this.editTabName(e, tabId));
+        this.tabButtonsContainer.appendChild(tabButton);
+
+        // Сохраняем пустое содержимое для новой вкладки
+        this.tabs[tabId] = '';
+
+        // Автоматически переключаемся на новую вкладку
+        this.switchTab(tabId);
+    }
+
+    switchTab(tabId) {
+        if (this.currentTab) {
+            // Сохраняем текущее содержимое перед переключением
+            this.tabs[this.currentTab] = this.contentElement.innerHTML;
+        }
+
+        // Активируем выбранную вкладку
+        this.contentElement.innerHTML = this.tabs[tabId];
+        this.currentTab = tabId;
+
+        // Обновляем стили кнопок вкладок
+        const buttons = this.tabButtonsContainer.getElementsByTagName('button');
+        for (let button of buttons) {
+            if (button.dataset.tabId === tabId) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        }
+    }
+
+    editTabName(event, tabId) {
+        const button = event.target;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = button.textContent;
+        input.classList.add('edit-tab-name');
+        
+        const saveNewName = () => {
+            button.textContent = input.value;
+            button.style.display = '';
+            input.remove();
+        };
+
+        input.addEventListener('blur', saveNewName);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveNewName();
+            }
+        });
+
+        button.style.display = 'none';
+        button.parentNode.insertBefore(input, button);
+        input.focus();
+    }
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    const tabManager = new TabManager();
+});

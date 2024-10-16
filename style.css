@@ -141,3 +141,106 @@ a {
 .highlight {
     background-color: yellow; /* Change color as needed */
 }
+
+.tab-buttons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.tab-content {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    padding: 10px;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content {
+    border: 1px solid #ccc;
+    min-height: 200px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: white;
+    outline: none;
+}
+
+.tab-buttons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.tab-buttons button:hover {
+    background-color: #e0e0e0;
+}
+
+#add-tab-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#add-tab-btn:hover {
+    background-color: #45a049;
+}
+
+#content {
+    border: 1px solid #ccc;
+    min-height: 200px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: white;
+    outline: none;
+}
+
+.tab-buttons {
+    margin-bottom: 10px;
+}
+
+.tab-buttons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.tab-buttons button.active {
+    background-color: #e0e0e0;
+    border-bottom: 2px solid #4CAF50;
+}
+
+.tab-buttons button:hover {
+    background-color: #e0e0e0;
+}
+
+#add-tab-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#add-tab-btn:hover {
+    background-color: #45a049;
+}
+
+.edit-tab-name {
+    margin: 0;
+    padding: 4px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    outline: none;
+    max-width: 150px;
+}
