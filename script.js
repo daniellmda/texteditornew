@@ -54,6 +54,11 @@ class Toolbar {
         this.nextButton = document.getElementById('nextButton'); // Кнопка "следующий"
         this.replaceButton = document.getElementById('replaceButton'); // Кнопка замены
         this.replaceAllButton = document.getElementById('replaceAllButton'); // Кнопка замены всех
+        this.fileInput = document.createElement('input');
+        this.fileInput.type = 'file';
+        this.fileInput.accept = '.txt';
+        this.fileInput.style.display = 'none';
+        document.body.appendChild(this.fileInput);
     }
 
     // Метод для добавления событий на элементы
@@ -67,6 +72,8 @@ class Toolbar {
         this.prevButton.addEventListener('click', () => this.findText('prev')); // Обработка нажатия на "предыдущий"
         this.nextButton.addEventListener('click', () => this.findText('next')); // Обработка нажатия на "следующий"
         this.replaceButton.addEventListener('click', () => this.replaceText(false)); // Обработка нажатия на замену
+        this.fileSelect.addEventListener('change', (e) => this.handleFileOperation(e.target.value));
+        this.fileInput.addEventListener('change', (e) => this.handleFileOpen(e));
         this.replaceAllButton.addEventListener('click', () => this.replaceText(true)); // Обработка нажатия на замену всех
         
         this.buttons.forEach(button => {
@@ -92,17 +99,36 @@ class Toolbar {
     handleFileOperation(operation) {
         switch (operation) {
             case 'new':
-                this.contentInstance.setContent(''); // Создание нового файла
-                this.filename.value = 'untitled'; // Назначение имени файла по умолчанию
+                this.contentInstance.setContent('');
+                this.filename.value = 'untitled';
                 break;
             case 'txt':
-                this.saveAsText(); // Сохранение файла как .txt
+                this.saveAsText();
+                break;
+            case 'open':
+                this.openFile();
                 break;
             case 'pdf':
-                this.saveAsPDF(); // Сохранение файла как .pdf
+                this.saveAsPDF();
                 break;
         }
-        this.fileSelect.selectedIndex = 0; // Сброс выбора в выпадающем списке
+        this.fileSelect.selectedIndex = 0;
+    }
+
+    openFile() {
+        this.fileInput.click();
+    }
+
+    handleFileOpen(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.contentInstance.setContent(e.target.result);
+                this.filename.value = file.name.replace('.txt', '');
+            };
+            reader.readAsText(file);
+        }
     }
 
     // Изменение шрифта текста
@@ -126,24 +152,6 @@ class Toolbar {
         }
     }
 
-    // Метод для открытия файла
-    openFile() {
-        const fileInput = document.createElement('input'); // Создаем элемент для выбора файла
-        fileInput.type = 'file';
-        fileInput.accept = '.txt'; // Принимаем только файлы .txt
-        fileInput.onchange = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader(); // Читаем файл с помощью FileReader
-                reader.onload = (e) => {
-                    this.contentInstance.setContent(e.target.result); // Устанавливаем содержимое файла в редактор
-                    this.filename.value = file.name.replace('.txt', ''); // Удаляем расширение из имени файла
-                };
-                reader.readAsText(file); // Чтение файла в текстовом формате
-            }
-        };
-        fileInput.click(); // Открываем диалоговое окно выбора файла
-    }
 
     // Сохранение файла как текстового
     saveAsText() {
@@ -371,6 +379,6 @@ class TabManager {
 }
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', () => {
+//document.addEventListener('DOMContentLoaded', () => {
     const tabManager = new TabManager();
-});
+//});

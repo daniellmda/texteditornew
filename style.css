@@ -121,6 +121,7 @@ a {
     align-items: center;
     gap: 10px;
     margin-bottom: 16px;
+	margin-top: 15px;
 }
 .search-replace input {
     padding: 6px 10px;
