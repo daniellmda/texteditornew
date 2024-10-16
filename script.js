@@ -18,11 +18,13 @@ class Content {
     // Переключение режима просмотра кода
     toggleCodeView() {
         if (this.element.isContentEditable) {
-            this.element.contentEditable = false; // Отключаем редактирование
-            this.element.style.border = 'none'; // Убираем границу
+            this.element.textContent = this.element.innerHTML; // Показываем HTML-код
+            this.element.contentEditable = false;
+            this.element.style.border = 'none';
         } else {
-            this.element.contentEditable = true; // Включаем редактирование
-            this.element.style.border = '1px solid #ccc'; // Включаем границу
+            this.element.innerHTML = this.element.textContent; // Показываем отформатированный текст
+            this.element.contentEditable = true;
+            this.element.style.border = '1px solid #ccc';
         }
     }
 }
@@ -66,6 +68,7 @@ class Toolbar {
         this.nextButton.addEventListener('click', () => this.findText('next')); // Обработка нажатия на "следующий"
         this.replaceButton.addEventListener('click', () => this.replaceText(false)); // Обработка нажатия на замену
         this.replaceAllButton.addEventListener('click', () => this.replaceText(true)); // Обработка нажатия на замену всех
+        
         this.buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const command = button.getAttribute('data-command'); // Получаем команду из атрибута кнопки
@@ -168,7 +171,7 @@ class Toolbar {
         html2pdf().set(opt).from(element).save();
     }
 
-    // Загрузка файла по ссылке
+    // Загрузка файла по 
     downloadFile(url, filename) {
         const link = document.createElement('a'); // Создаем элемент <a> для загрузки файла
         link.href = url;
