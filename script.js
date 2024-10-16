@@ -185,8 +185,28 @@ class Toolbar {
     // Добавление ссылки в текст
     addLink() {
         const url = prompt('Insert url'); // Запрашиваем URL у пользователя
-        this.formatDoc('createLink', url); // Применяем команду создания ссылки
-    }
+        if (url) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const span = document.createElement('span');
+                const fontFamily = window.getComputedStyle(this.contentInstance.element).fontFamily;
+                const fontSize = window.getComputedStyle(this.contentInstance.element).fontSize;
+                const color = window.getComputedStyle(this.contentInstance.element).color;
+    
+                // Применяем текущие стили к span
+                span.style.fontFamily = fontFamily;
+                span.style.fontSize = fontSize;
+                span.style.color = color;
+    
+                document.execCommand('createLink', false, url); // Добавляем ссылку
+    
+                const link = range.startContainer.parentNode; // Получаем элемент ссылки
+                link.style.fontFamily = fontFamily;
+                link.style.fontSize = fontSize;
+                link.style.color = color;
+            }
+        }}
 
     // Метод поиска текста
    // Метод поиска текста
