@@ -75,7 +75,7 @@ class Toolbar {
         this.fileSelect.addEventListener('change', (e) => this.handleFileOperation(e.target.value)); // Обработчик выбора операции с файлами
         this.fileInput.addEventListener('change', (e) => this.handleFileOpen(e)); // Обработка открытия файла
         this.replaceAllButton.addEventListener('click', () => this.replaceText(true)); // Обработка нажатия на замену всех
-                // Обработчики событий для кнопок панели инструментов
+        // Обработчики событий для кнопок панели инструментов
         this.buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const command = button.getAttribute('data-command'); // Получаем команду из атрибута кнопки
@@ -95,7 +95,7 @@ class Toolbar {
         document.execCommand(command, false, value); // Выполняем команду редактирования текста
     }
 
-        // Обработка выбранной операции с файлом (новый, открыть, сохранить как текст или PDF)
+    // Обработка выбранной операции с файлом (новый, открыть, сохранить как текст или PDF)
     handleFileOperation(operation) {
         switch (operation) {
             case 'new':
@@ -119,7 +119,7 @@ class Toolbar {
         this.fileInput.click(); // Имитируем нажатие на input для выбора файла
     }
 
-        // Обработка загруженного файла
+    // Обработка загруженного файла
     handleFileOpen(event) {
         const file = event.target.files[0]; // Получаем файл
         if (file) {
@@ -162,8 +162,8 @@ class Toolbar {
         const url = URL.createObjectURL(blob); // Создаем ссылку на этот Blob
         this.downloadFile(url, `${this.filename.value}.txt`); // Загружаем файл
     }
-    
-    
+
+
 
     // Сохранение файла как PDF
     saveAsPDF() {
@@ -205,98 +205,99 @@ class Toolbar {
                 const fontFamily = window.getComputedStyle(this.contentInstance.element).fontFamily; // Получаем текущий шрифт
                 const fontSize = window.getComputedStyle(this.contentInstance.element).fontSize; // Получаем текущий размер шрифта
                 const color = window.getComputedStyle(this.contentInstance.element).color; // Получаем текущий цвет текста
-    
+
                 // Применяем текущие стили к span
                 span.style.fontFamily = fontFamily;
                 span.style.fontSize = fontSize;
                 span.style.color = color;
-    
+
                 document.execCommand('createLink', false, url); // Добавляем ссылку
-    
+
                 const link = range.startContainer.parentNode; // Получаем элемент ссылки
                 link.style.fontFamily = fontFamily;  // Применяем шрифт к ссылке
                 link.style.fontSize = fontSize; // Применяем размер шрифта к ссылке
                 link.style.color = color; // Применяем цвет текста к ссылке
             }
-        }}
+        }
+    }
 
 
-   // Метод поиска текста
-   findText(direction) {
-    const searchTerm = this.searchInput.value; // Получаем поисковый запрос
-    let content = this.contentInstance.getContent();  // Получаем текст контента
+    // Метод поиска текста
+    findText(direction) {
+        const searchTerm = this.searchInput.value; // Получаем поисковый запрос
+        let content = this.contentInstance.getContent();  // Получаем текст контента
 
-    // Сброс выделения
-    content = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-    this.contentInstance.setContent(content); // Устанавливаем обновленный контент
+        // Сброс выделения
+        content = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+        this.contentInstance.setContent(content); // Устанавливаем обновленный контент
 
-    if (searchTerm) { // Проверяем, если поисковый запрос не пустой
-        const regex = new RegExp(searchTerm, 'gi'); // Создаем регулярное выражение для поиска
-        const matches = [...content.matchAll(regex)]; // Находим все совпадения
+        if (searchTerm) { // Проверяем, если поисковый запрос не пустой
+            const regex = new RegExp(searchTerm, 'gi'); // Создаем регулярное выражение для поиска
+            const matches = [...content.matchAll(regex)]; // Находим все совпадения
 
-        if (matches.length > 0) {  // Если найдены совпадения
-            // Инициализация текущего индекса
-            if (this.contentInstance.currentMatchIndex === undefined) {
-                  // Если направление поиска "предыдущий", начинаем с последнего совпадения
-                this.contentInstance.currentMatchIndex = direction === 'prev' ? matches.length - 1 : 0;
-            } else {
-                // Изменение индекса в зависимости от направления
-                if (direction === 'next') {
-                    this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex + 1) % matches.length;
-                } else if (direction === 'prev') {
-                    this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex - 1 + matches.length) % matches.length;
+            if (matches.length > 0) {  // Если найдены совпадения
+                // Инициализация текущего индекса
+                if (this.contentInstance.currentMatchIndex === undefined) {
+                    // Если направление поиска "предыдущий", начинаем с последнего совпадения
+                    this.contentInstance.currentMatchIndex = direction === 'prev' ? matches.length - 1 : 0;
+                } else {
+                    // Изменение индекса в зависимости от направления
+                    if (direction === 'next') {
+                        this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex + 1) % matches.length;
+                    } else if (direction === 'prev') {
+                        this.contentInstance.currentMatchIndex = (this.contentInstance.currentMatchIndex - 1 + matches.length) % matches.length;
+                    }
                 }
-            }
 
-            const currentIndex = this.contentInstance.currentMatchIndex; // Текущий индекс совпадения
-            const start = matches[currentIndex].index; // Начальная позиция совпадения
-            const end = start + searchTerm.length; // Конечная позиция совпадения
-// Создаем новый контент с выделенным совпадением
-            const highlightedContent = content.substring(0, start) +
-                `<span class="highlight">${content.substring(start, end)}</span>` +
-                content.substring(end);
-// Обновляем контент с выделением
-            this.contentInstance.setContent(highlightedContent);
+                const currentIndex = this.contentInstance.currentMatchIndex; // Текущий индекс совпадения
+                const start = matches[currentIndex].index; // Начальная позиция совпадения
+                const end = start + searchTerm.length; // Конечная позиция совпадения
+                // Создаем новый контент с выделенным совпадением
+                const highlightedContent = content.substring(0, start) +
+                    `<span class="highlight">${content.substring(start, end)}</span>` +
+                    content.substring(end);
+                // Обновляем контент с выделением
+                this.contentInstance.setContent(highlightedContent);
 
-            const highlightedElement = this.contentInstance.element.querySelector('.highlight');  // Находим выделенный элемент
-            if (highlightedElement) {
-                                // Прокручиваем к выделенному элементу с плавным скроллингом
-                highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const highlightedElement = this.contentInstance.element.querySelector('.highlight');  // Находим выделенный элемент
+                if (highlightedElement) {
+                    // Прокручиваем к выделенному элементу с плавным скроллингом
+                    highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                // Оповещение, если совпадений не найдено
+                alert('Совпадений не найдено');
             }
         } else {
-            // Оповещение, если совпадений не найдено
-            alert('Совпадений не найдено');
+            // Оповещение, если поисковый запрос пуст
+            alert('Введите текст для поиска');
         }
-    } else {
-        // Оповещение, если поисковый запрос пуст
-        alert('Введите текст для поиска');
     }
-}
 
 
 
 
     // Метод замены текста
-// Метод замены текста
-replaceText(replaceAll) {
-    const searchTerm = this.searchInput.value; // Получаем текст для поиска
-    const replaceTerm = this.replaceInput.value; // Получаем текст для замены
-    const content = this.contentInstance.getContent(); // Получаем текущее содержимое
+    // Метод замены текста
+    replaceText(replaceAll) {
+        const searchTerm = this.searchInput.value; // Получаем текст для поиска
+        const replaceTerm = this.replaceInput.value; // Получаем текст для замены
+        const content = this.contentInstance.getContent(); // Получаем текущее содержимое
 
-    // Сброс выделения
-    this.contentInstance.setContent(content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1'));
+        // Сброс выделения
+        this.contentInstance.setContent(content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1'));
 
-    if (replaceAll) {
-        // Замена всех вхождений, игнорируя регистр
-        const newContent = content.replace(new RegExp(searchTerm, 'gi'), replaceTerm);
-        this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
-    } else {
-        // Замена только первого вхождения, игнорируя регистр
-        const newContent = content.replace(new RegExp(searchTerm, 'i'), replaceTerm);
-        this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+        if (replaceAll) {
+            // Замена всех вхождений, игнорируя регистр
+            const newContent = content.replace(new RegExp(searchTerm, 'gi'), replaceTerm);
+            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+        } else {
+            // Замена только первого вхождения, игнорируя регистр
+            const newContent = content.replace(new RegExp(searchTerm, 'i'), replaceTerm);
+            this.contentInstance.setContent(newContent); // Устанавливаем новое содержимое
+        }
     }
 }
-}   
 
 // Инициализация редактора
 const contentInstance = new Content(); // Создаем экземпляр класса Content
@@ -320,7 +321,7 @@ class TabManager {
     addTab() {
         this.tabCounter += 1; // Увеличиваем счётчик вкладок
         const tabId = `tab-${this.tabCounter}`; // Создаем уникальный идентификатор вкладки
-        
+
         // Создаем кнопку вкладки
         const tabButton = document.createElement('button');
         tabButton.textContent = `Tab ${this.tabCounter}`; // Название кнопки вкладки
@@ -365,7 +366,7 @@ class TabManager {
         input.type = 'text';
         input.value = button.textContent; // Устанавливаем текущее имя вкладки в поле ввода
         input.classList.add('edit-tab-name'); // Добавляем класс для стилизации поля ввода
-                // Функция для сохранения нового имени вкладки
+        // Функция для сохранения нового имени вкладки
 
         const saveNewName = () => {
             button.textContent = input.value; // Устанавливаем новое имя для кнопки вкладки
@@ -374,7 +375,7 @@ class TabManager {
         };
         // Сохраняем новое имя вкладки, когда фокус уходит с поля ввода
         input.addEventListener('blur', saveNewName);
-                // Сохраняем новое имя при нажатии клавиши "Enter"
+        // Сохраняем новое имя при нажатии клавиши "Enter"
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 saveNewName();
@@ -389,5 +390,5 @@ class TabManager {
 
 // Инициализация
 //document.addEventListener('DOMContentLoaded', () => {
-    const tabManager = new TabManager();
+const tabManager = new TabManager();
 //});
