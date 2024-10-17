@@ -18,13 +18,13 @@ class Content {
     // Переключение режима просмотра кода
     toggleCodeView() {
         if (this.element.isContentEditable) {
-            this.element.textContent = this.element.innerHTML; // Показываем HTML-код
-            this.element.contentEditable = false;
-            this.element.style.border = 'none';
+            this.element.textContent = this.element.innerHTML;  // Если режим редактирования активен, показываем HTML-код
+            this.element.contentEditable = false; // Выключаем режим редактирования
+            this.element.style.border = 'none';   // Убираем рамку
         } else {
-            this.element.innerHTML = this.element.textContent; // Показываем отформатированный текст
-            this.element.contentEditable = true;
-            this.element.style.border = '1px solid #ccc';
+            this.element.innerHTML = this.element.textContent; // Если режим редактирования выключен, показываем отформатированный текст
+            this.element.contentEditable = true; // Включаем режим редактирования
+            this.element.style.border = '1px solid #ccc'; // Добавляем рамку для индикации редактирования
         }
     }
 }
@@ -54,11 +54,11 @@ class Toolbar {
         this.nextButton = document.getElementById('nextButton'); // Кнопка "следующий"
         this.replaceButton = document.getElementById('replaceButton'); // Кнопка замены
         this.replaceAllButton = document.getElementById('replaceAllButton'); // Кнопка замены всех
-        this.fileInput = document.createElement('input');
-        this.fileInput.type = 'file';
-        this.fileInput.accept = '.txt';
-        this.fileInput.style.display = 'none';
-        document.body.appendChild(this.fileInput);
+        this.fileInput = document.createElement('input'); // Скрытый элемент для выбора файла (input type="file")
+        this.fileInput.type = 'file'; // Тип input - файл
+        this.fileInput.accept = '.txt'; // Ограничение выбора файлов текстовыми файлами
+        this.fileInput.style.display = 'none';  // Прячем элемент
+        document.body.appendChild(this.fileInput); // Добавляем input в тело документа
     }
 
     // Метод для добавления событий на элементы
@@ -72,10 +72,10 @@ class Toolbar {
         this.prevButton.addEventListener('click', () => this.findText('prev')); // Обработка нажатия на "предыдущий"
         this.nextButton.addEventListener('click', () => this.findText('next')); // Обработка нажатия на "следующий"
         this.replaceButton.addEventListener('click', () => this.replaceText(false)); // Обработка нажатия на замену
-        this.fileSelect.addEventListener('change', (e) => this.handleFileOperation(e.target.value));
-        this.fileInput.addEventListener('change', (e) => this.handleFileOpen(e));
+        this.fileSelect.addEventListener('change', (e) => this.handleFileOperation(e.target.value)); // Обработчик выбора операции с файлами
+        this.fileInput.addEventListener('change', (e) => this.handleFileOpen(e)); // Обработка открытия файла
         this.replaceAllButton.addEventListener('click', () => this.replaceText(true)); // Обработка нажатия на замену всех
-        
+                // Обработчики событий для кнопок панели инструментов
         this.buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const command = button.getAttribute('data-command'); // Получаем команду из атрибута кнопки
@@ -95,39 +95,40 @@ class Toolbar {
         document.execCommand(command, false, value); // Выполняем команду редактирования текста
     }
 
-    // Обработка выбранной операции с файлом
+        // Обработка выбранной операции с файлом (новый, открыть, сохранить как текст или PDF)
     handleFileOperation(operation) {
         switch (operation) {
             case 'new':
-                this.contentInstance.setContent('');
-                this.filename.value = 'untitled';
+                this.contentInstance.setContent(''); // Очищаем контент для нового файла
+                this.filename.value = 'untitled'; // Устанавливаем имя по умолчанию
                 break;
             case 'txt':
-                this.saveAsText();
+                this.saveAsText(); // Сохраняем как текст
                 break;
             case 'open':
-                this.openFile();
+                this.openFile(); // Открываем файл
                 break;
             case 'pdf':
-                this.saveAsPDF();
+                this.saveAsPDF(); // Сохраняем как PDF
                 break;
         }
-        this.fileSelect.selectedIndex = 0;
+        this.fileSelect.selectedIndex = 0; // Сбрасываем выбор в выпадающем списке
     }
 
     openFile() {
-        this.fileInput.click();
+        this.fileInput.click(); // Имитируем нажатие на input для выбора файла
     }
 
+        // Обработка загруженного файла
     handleFileOpen(event) {
-        const file = event.target.files[0];
+        const file = event.target.files[0]; // Получаем файл
         if (file) {
-            const reader = new FileReader();
+            const reader = new FileReader(); // Создаем FileReader для чтения файла
             reader.onload = (e) => {
-                this.contentInstance.setContent(e.target.result);
-                this.filename.value = file.name.replace('.txt', '');
+                this.contentInstance.setContent(e.target.result); // Загружаем содержимое файла в редактор
+                this.filename.value = file.name.replace('.txt', '');  // Устанавливаем имя файла без расширения
             };
-            reader.readAsText(file);
+            reader.readAsText(file); // Читаем файл как текст
         }
     }
 
@@ -153,7 +154,7 @@ class Toolbar {
     }
 
 
-    // Сохранение файла как текстового
+    // Сохранение а как текстового
     saveAsText() {
         let contentText = this.contentInstance.element.textContent; // Получаем текст без HTML
         contentText = contentText.trim(); // Удаляем пробелы в начале и в конце текста
@@ -166,7 +167,7 @@ class Toolbar {
 
     // Сохранение файла как PDF
     saveAsPDF() {
-        const filename = `${this.filename.value}.pdf`;
+        const filename = `${this.filename.value}.pdf`; // Устанавливаем имя файла
         const element = this.contentInstance.element; // Получаем элемент контента
         const opt = {
             margin: 1,
@@ -179,11 +180,11 @@ class Toolbar {
         html2pdf().set(opt).from(element).save();
     }
 
-    // Загрузка файла по 
+    // Загрузка файла
     downloadFile(url, filename) {
         const link = document.createElement('a'); // Создаем элемент <a> для загрузки файла
-        link.href = url;
-        link.download = filename;
+        link.href = url; // Устанавливаем ссылку на файл
+        link.download = filename; // Устанавливаем имя файла
         link.click(); // Нажимаем на ссылку для начала загрузки
     }
 
@@ -196,14 +197,14 @@ class Toolbar {
     // Добавление ссылки в текст
     addLink() {
         const url = prompt('Insert url'); // Запрашиваем URL у пользователя
-        if (url) {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const span = document.createElement('span');
-                const fontFamily = window.getComputedStyle(this.contentInstance.element).fontFamily;
-                const fontSize = window.getComputedStyle(this.contentInstance.element).fontSize;
-                const color = window.getComputedStyle(this.contentInstance.element).color;
+        if (url) { // Проверяем, ввёл ли пользователь URL
+            const selection = window.getSelection(); // Получаем текущее выделение текста
+            if (selection.rangeCount > 0) { // Проверяем, есть ли выделенный текст
+                const range = selection.getRangeAt(0); // Получаем диапазон выделения
+                const span = document.createElement('span'); // Создаем элемент <span> для стилей
+                const fontFamily = window.getComputedStyle(this.contentInstance.element).fontFamily; // Получаем текущий шрифт
+                const fontSize = window.getComputedStyle(this.contentInstance.element).fontSize; // Получаем текущий размер шрифта
+                const color = window.getComputedStyle(this.contentInstance.element).color; // Получаем текущий цвет текста
     
                 // Применяем текущие стили к span
                 span.style.fontFamily = fontFamily;
@@ -213,29 +214,30 @@ class Toolbar {
                 document.execCommand('createLink', false, url); // Добавляем ссылку
     
                 const link = range.startContainer.parentNode; // Получаем элемент ссылки
-                link.style.fontFamily = fontFamily;
-                link.style.fontSize = fontSize;
-                link.style.color = color;
+                link.style.fontFamily = fontFamily;  // Применяем шрифт к ссылке
+                link.style.fontSize = fontSize; // Применяем размер шрифта к ссылке
+                link.style.color = color; // Применяем цвет текста к ссылке
             }
         }}
 
-    // Метод поиска текста
+
    // Метод поиска текста
    findText(direction) {
-    const searchTerm = this.searchInput.value;
-    let content = this.contentInstance.getContent();
+    const searchTerm = this.searchInput.value; // Получаем поисковый запрос
+    let content = this.contentInstance.getContent();  // Получаем текст контента
 
     // Сброс выделения
     content = content.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-    this.contentInstance.setContent(content);
+    this.contentInstance.setContent(content); // Устанавливаем обновленный контент
 
-    if (searchTerm) {
-        const regex = new RegExp(searchTerm, 'gi');
-        const matches = [...content.matchAll(regex)];
+    if (searchTerm) { // Проверяем, если поисковый запрос не пустой
+        const regex = new RegExp(searchTerm, 'gi'); // Создаем регулярное выражение для поиска
+        const matches = [...content.matchAll(regex)]; // Находим все совпадения
 
-        if (matches.length > 0) {
+        if (matches.length > 0) {  // Если найдены совпадения
             // Инициализация текущего индекса
             if (this.contentInstance.currentMatchIndex === undefined) {
+                  // Если направление поиска "предыдущий", начинаем с последнего совпадения
                 this.contentInstance.currentMatchIndex = direction === 'prev' ? matches.length - 1 : 0;
             } else {
                 // Изменение индекса в зависимости от направления
@@ -246,18 +248,19 @@ class Toolbar {
                 }
             }
 
-            const currentIndex = this.contentInstance.currentMatchIndex;
-            const start = matches[currentIndex].index;
-            const end = start + searchTerm.length;
-
+            const currentIndex = this.contentInstance.currentMatchIndex; // Текущий индекс совпадения
+            const start = matches[currentIndex].index; // Начальная позиция совпадения
+            const end = start + searchTerm.length; // Конечная позиция совпадения
+// Создаем новый контент с выделенным совпадением
             const highlightedContent = content.substring(0, start) +
                 `<span class="highlight">${content.substring(start, end)}</span>` +
                 content.substring(end);
-
+// Обновляем контент с выделением
             this.contentInstance.setContent(highlightedContent);
 
-            const highlightedElement = this.contentInstance.element.querySelector('.highlight');
+            const highlightedElement = this.contentInstance.element.querySelector('.highlight');  // Находим выделенный элемент
             if (highlightedElement) {
+                                // Прокручиваем к выделенному элементу с плавным скроллингом
                 highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         } else {
@@ -276,8 +279,8 @@ class Toolbar {
     // Метод замены текста
 // Метод замены текста
 replaceText(replaceAll) {
-    const searchTerm = this.searchInput.value;
-    const replaceTerm = this.replaceInput.value;
+    const searchTerm = this.searchInput.value; // Получаем текст для поиска
+    const replaceTerm = this.replaceInput.value; // Получаем текст для замены
     const content = this.contentInstance.getContent(); // Получаем текущее содержимое
 
     // Сброс выделения
@@ -301,28 +304,31 @@ const toolbar = new Toolbar(contentInstance); // Создаем экземпля
 
 class TabManager {
     constructor() {
-        this.tabButtonsContainer = document.getElementById('tab-buttons');
-        this.contentElement = document.getElementById('content');
-        this.addTabButton = document.getElementById('add-tab-btn');
-        this.tabs = {};
-        this.currentTab = null;
-        this.tabCounter = 0;
+        this.tabButtonsContainer = document.getElementById('tab-buttons'); // Получаем контейнер для вкладок
+        this.contentElement = document.getElementById('content');  // Получаем элемент для отображения содержимого вкладки
+        this.addTabButton = document.getElementById('add-tab-btn');  // Получаем кнопку для добавления новой вкладки
+        this.tabs = {}; // Массив для хранения всех вкладок
+        this.currentTab = null;  // Переменная для отслеживания активной вкладки
+        this.tabCounter = 0; // Счётчик для уникальных имен вкладок
+        // Добавляем обработчик событий для кнопки добавления новой вкладки
 
         this.addTabButton.addEventListener('click', () => this.addTab());
         this.addTab(); // Создаем первую вкладку автоматически
     }
+    // Метод для добавления новой вкладки
 
     addTab() {
-        this.tabCounter += 1;
-        const tabId = `tab-${this.tabCounter}`;
+        this.tabCounter += 1; // Увеличиваем счётчик вкладок
+        const tabId = `tab-${this.tabCounter}`; // Создаем уникальный идентификатор вкладки
         
         // Создаем кнопку вкладки
         const tabButton = document.createElement('button');
-        tabButton.textContent = `Tab ${this.tabCounter}`;
-        tabButton.dataset.tabId = tabId;
+        tabButton.textContent = `Tab ${this.tabCounter}`; // Название кнопки вкладки
+        tabButton.dataset.tabId = tabId;  // Устанавливаем идентификатор вкладки в атрибут data-tab-id
+        // Добавляем обработчики событий для переключения и редактирования имени вкладки
         tabButton.addEventListener('click', () => this.switchTab(tabId));
         tabButton.addEventListener('dblclick', (e) => this.editTabName(e, tabId));
-        this.tabButtonsContainer.appendChild(tabButton);
+        this.tabButtonsContainer.appendChild(tabButton); // Добавляем кнопку вкладки в контейнер    
 
         // Сохраняем пустое содержимое для новой вкладки
         this.tabs[tabId] = '';
@@ -330,6 +336,7 @@ class TabManager {
         // Автоматически переключаемся на новую вкладку
         this.switchTab(tabId);
     }
+    // Метод для переключения между вкладками
 
     switchTab(tabId) {
         if (this.currentTab) {
@@ -339,42 +346,44 @@ class TabManager {
 
         // Активируем выбранную вкладку
         this.contentElement.innerHTML = this.tabs[tabId];
-        this.currentTab = tabId;
+        this.currentTab = tabId; // Устанавливаем новую активную вкладку
 
         // Обновляем стили кнопок вкладок
         const buttons = this.tabButtonsContainer.getElementsByTagName('button');
         for (let button of buttons) {
             if (button.dataset.tabId === tabId) {
-                button.classList.add('active');
+                button.classList.add('active');  // Добавляем класс активной вкладке
             } else {
-                button.classList.remove('active');
+                button.classList.remove('active'); // Убираем класс с неактивных вкладок
             }
         }
     }
-
+    // Метод для редактирования имени вкладки
     editTabName(event, tabId) {
-        const button = event.target;
-        const input = document.createElement('input');
+        const button = event.target; // Получаем кнопку вкладки, на которой был выполнен двойной клик
+        const input = document.createElement('input'); // Создаем поле ввода
         input.type = 'text';
-        input.value = button.textContent;
-        input.classList.add('edit-tab-name');
-        
-        const saveNewName = () => {
-            button.textContent = input.value;
-            button.style.display = '';
-            input.remove();
-        };
+        input.value = button.textContent; // Устанавливаем текущее имя вкладки в поле ввода
+        input.classList.add('edit-tab-name'); // Добавляем класс для стилизации поля ввода
+                // Функция для сохранения нового имени вкладки
 
+        const saveNewName = () => {
+            button.textContent = input.value; // Устанавливаем новое имя для кнопки вкладки
+            button.style.display = ''; // Отображаем кнопку вкладки
+            input.remove(); // Удаляем поле ввода
+        };
+        // Сохраняем новое имя вкладки, когда фокус уходит с поля ввода
         input.addEventListener('blur', saveNewName);
+                // Сохраняем новое имя при нажатии клавиши "Enter"
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 saveNewName();
             }
         });
-
+        // Скрываем кнопку вкладки и заменяем её полем ввода
         button.style.display = 'none';
-        button.parentNode.insertBefore(input, button);
-        input.focus();
+        button.parentNode.insertBefore(input, button); // Вставляем поле ввода перед кнопкой
+        input.focus();  // Устанавливаем фокус на поле ввода
     }
 }
 
